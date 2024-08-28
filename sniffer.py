@@ -4,13 +4,10 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import datetime
 
-# Print available network interfaces
 interfaces = get_if_list()
 print("Available interfaces:")
 for iface in interfaces:
     print(iface)
-
-# Define the interface to sniff on
 interface = "Wi-Fi"  # Replace with the correct network interface name from the list
 
 # File to store packet logs
@@ -33,19 +30,14 @@ def packet_callback(packet):
     }
     df = pd.DataFrame(data)
     
-    # Append packet data to CSV file
+   
     df.to_csv(log_file, mode='a', header=False, index=False)
 
-# Sniff packets
+
 print(f"Sniffing packets on {interface}...")
 sniff(iface=interface, prn=packet_callback, count=50)
-
-# Load the log data for visualization
 df = pd.read_csv(log_file, names=['Time', 'Source', 'Destination', 'Length'])
-
-# Convert Time column to datetime
 df['Time'] = pd.to_datetime(df['Time'])
-
 # Define color map for packet lengths
 norm = mcolors.Normalize(vmin=df['Length'].min(), vmax=df['Length'].max())
 cmap = plt.get_cmap('viridis')
@@ -53,8 +45,6 @@ cmap = plt.get_cmap('viridis')
 # Plot packet lengths over time with different colors
 plt.figure(figsize=(12, 8))
 sc = plt.scatter(df['Time'], df['Length'], c=df['Length'], cmap=cmap, norm=norm, alpha=0.7, edgecolors='w', s=80)
-
-# Add color bar
 cbar = plt.colorbar(sc)
 cbar.set_label('Packet Length (bytes)', fontsize=14)
 
